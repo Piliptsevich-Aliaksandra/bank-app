@@ -1,5 +1,4 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Float, CheckConstraint, event
-from sqlalchemy.orm import declarative_base
 from datetime import datetime
 
 from app.database import Base

@@ -19,12 +19,10 @@ def get_account(db: Session, account_id: int, user_id: int):
 
 
 def get_accounts_by_owner(db: Session, user_id: int):
-    """Возвращает все счета, принадлежащие пользователю."""
     return db.query(Account).filter(Account.user_id == user_id).all()
 
 
 def delete_account(db: Session, account_id: int, user_id: int):
-    """Удаляет счет по ID."""
     account = db.query(Account).filter(Account.id == account_id and Account.user_id == user_id).first()
     if not account:
         raise HTTPException(status_code=404, detail="Account not found")

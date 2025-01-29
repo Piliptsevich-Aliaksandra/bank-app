@@ -9,12 +9,10 @@ from sqlalchemy.orm import Session
 
 @pytest.mark.usefixtures("setup_db")
 def test_create_payment(db: Session):
-    # Создаем пользователя для платежа
     user = create_user(db, name="Test User", email="testuser@example.com", password="securepassword")
     account1 = create_account(db, user_id=user.id, name="Test Account 1", balance=500.0)
     account2 = create_account(db, user_id=user.id, name="Test Account 2", balance=0.0)
 
-    # Создаем платеж
     payment = create_payment(db, remitter_account_id=account1.id, beneficiary_account_id=account2.id, user_id=user.id, amount=100.0, email="aaa@aaa.com")
     assert payment.id is not None
     assert payment.remitter_account_id == account1.id
@@ -25,7 +23,6 @@ def test_create_payment(db: Session):
 
 @pytest.mark.usefixtures("setup_db")
 def test_payment_with_negative_amount(db: Session):
-    # Создаем пользователя для платежа
     user = create_user(db, name="Test User", email="testuser@example.com", password="securepassword")
     account1 = create_account(db, user_id=user.id, name="Test Account 1", balance=500.0)
     account2 = create_account(db, user_id=user.id, name="Test Account 2", balance=0.0)
@@ -39,7 +36,6 @@ def test_payment_with_negative_amount(db: Session):
 
 @pytest.mark.usefixtures("setup_db")
 def test_payment_to_the_same_account(db: Session):
-    # Создаем пользователя для платежа
     user = create_user(db, name="Test User", email="testuser@example.com", password="securepassword")
 
     with pytest.raises(HTTPException) as excinfo:
@@ -51,7 +47,6 @@ def test_payment_to_the_same_account(db: Session):
 
 @pytest.mark.usefixtures("setup_db")
 def test_payment_when_accounts_not_found(db: Session):
-    # Создаем пользователя для платежа
     user = create_user(db, name="Test User", email="testuser@example.com", password="securepassword")
 
     with pytest.raises(HTTPException) as excinfo:
@@ -63,7 +58,6 @@ def test_payment_when_accounts_not_found(db: Session):
 
 @pytest.mark.usefixtures("setup_db")
 def test_payment_with_insufficient_funds(db: Session):
-    # Создаем пользователя для платежа
     user = create_user(db, name="Test User", email="testuser@example.com", password="securepassword")
     account1 = create_account(db, user_id=user.id, name="Test Account 1", balance=200.0)
     account2 = create_account(db, user_id=user.id, name="Test Account 2", balance=0.0)
@@ -77,12 +71,10 @@ def test_payment_with_insufficient_funds(db: Session):
 
 @pytest.mark.usefixtures("setup_db")
 def test_get_payment(db: Session):
-    # Создаем пользователя для платежа
     user = create_user(db, name="Test User", email="testuser@example.com", password="securepassword")
     account1 = create_account(db, user_id=user.id, name="Test Account 1", balance=500.0)
     account2 = create_account(db, user_id=user.id, name="Test Account 2", balance=0.0)
 
-    # Создаем платеж
     created_payment = create_payment(db, remitter_account_id=account1.id, beneficiary_account_id=account2.id, user_id=user.id, amount=100.0, email="aaa@aaa.com")
 
     payment = get_payment(db, user_id=user.id, payment_id=created_payment.id)
@@ -92,7 +84,6 @@ def test_get_payment(db: Session):
 
 @pytest.mark.usefixtures("setup_db")
 def test_get_payment_not_found(db: Session):
-    # Создаем пользователя для платежа
     user = create_user(db, name="Test User", email="testuser@example.com", password="securepassword")
 
     with pytest.raises(HTTPException) as excinfo:
@@ -104,13 +95,11 @@ def test_get_payment_not_found(db: Session):
 
 @pytest.mark.usefixtures("setup_db")
 def test_get_outcome_payments(db: Session):
-    # Создаем пользователя для платежа
     user1 = create_user(db, name="Test User 1", email="testuser1@example.com", password="securepassword")
     user2 = create_user(db, name="Test User 2", email="testuser2@example.com", password="securepassword")
     account1 = create_account(db, user_id=user1.id, name="Test Account 1", balance=500.0)
     account2 = create_account(db, user_id=user2.id, name="Test Account 2", balance=0.0)
 
-    # Создаем платеж
     created_payment = create_payment(db, remitter_account_id=account1.id, beneficiary_account_id=account2.id, user_id=user1.id, amount=100.0, email="aaa@aaa.com")
 
     payments = get_outcome_payments(db, user_id=user1.id)
@@ -120,13 +109,11 @@ def test_get_outcome_payments(db: Session):
 
 @pytest.mark.usefixtures("setup_db")
 def test_get_income_payments(db: Session):
-    # Создаем пользователя для платежа
     user1 = create_user(db, name="Test User 1", email="testuser1@example.com", password="securepassword")
     user2 = create_user(db, name="Test User 2", email="testuser2@example.com", password="securepassword")
     account1 = create_account(db, user_id=user1.id, name="Test Account 1", balance=500.0)
     account2 = create_account(db, user_id=user2.id, name="Test Account 2", balance=0.0)
 
-    # Создаем платеж
     created_payment = create_payment(db, remitter_account_id=account1.id, beneficiary_account_id=account2.id, user_id=user1.id, amount=100.0, email="aaa@aaa.com")
 
     payments = get_income_payments(db, user_id=user2.id)

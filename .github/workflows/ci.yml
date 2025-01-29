@@ -42,7 +42,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Ожидание запуска БД
-        run: sleep 10  # Ждем, пока Postgres запустится
+        run: sleep 10
 
       - name: Запуск тестов
         run: pytest --cov=app tests/

@@ -6,7 +6,7 @@ from app.auth.token import get_current_user
 from app.metrics import payment_counter
 from app.schemas.payment import PaymentCreateSchema
 from app.services.payment_service import create_payment, get_payment, get_income_payments, get_outcome_payments
-from prometheus_client import Counter
+
 router = APIRouter()
 
 @router.get("/income")
