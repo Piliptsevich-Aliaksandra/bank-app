@@ -3,7 +3,11 @@ from sqlalchemy.orm import Session
 from app.models.account import Account
 from app.models.payment import Payment
 from fastapi import HTTPException
+from prometheus_client import Counter
 
+payment_counter = Counter(
+    "successful_payments", "Total number of successful payments processed"
+)
 
 def create_payment(db: Session, remitter_account_id: int, beneficiary_account_id: int, amount: float, user_id: int, email: str):
     if amount <= 0:
@@ -33,6 +37,8 @@ def create_payment(db: Session, remitter_account_id: int, beneficiary_account_id
     db.add(payment)
     db.commit()
     db.refresh(payment)
+
+    payment_counter.inc()
 
     # payment_data = {
     #     'user_email': email,

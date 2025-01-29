@@ -5,7 +5,11 @@ from app.database import get_db
 from app.auth.token import get_current_user
 from app.schemas.payment import PaymentCreateSchema
 from app.services.payment_service import create_payment, get_payment, get_income_payments, get_outcome_payments
+from prometheus_client import Counter
 
+payment_counter = Counter(
+    "total_payments", "Total number of payments processed"
+)
 router = APIRouter()
 
 @router.get("/income")
@@ -18,6 +22,7 @@ def get_outcome_payments_for_account(db: Session = Depends(get_db), current_user
 
 @router.post("/")
 def create_new_payment(payment: PaymentCreateSchema, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
+    payment_counter.inc()
     return create_payment(db, payment.from_account, payment.to_account, float(payment.amount), current_user["id"], current_user["email"])
 
 @router.get("/{payment_id}")
