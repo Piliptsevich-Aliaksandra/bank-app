@@ -16,3 +16,4 @@ kafka~=1.3.5
 confluent-kafka~=2.8.0
 pydantic[email]
 prometheus_fastapi_instrumentator
+pytest-cov
