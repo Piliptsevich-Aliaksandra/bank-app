@@ -32,7 +32,7 @@ def start_consumer():
     logger.info("Consumer started")
     channel.start_consuming()
 
-if __name__ == "__main__":
+def main():
     threads = []
     for i in range(3):
         thread = threading.Thread(target=start_consumer)
@@ -41,3 +41,8 @@ if __name__ == "__main__":
 
     for thread in threads:
         thread.join()
+
+
+if __name__ == "__main__":
+    main()
+
