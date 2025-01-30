@@ -1,12 +1,8 @@
 import json
-import os
-import subprocess
 import time
 import threading
 import pytest
 from unittest.mock import patch, MagicMock
-
-import app
 from app.consumers.payment_consumer import send_email, process_message, start_consumer
 from app.logging_config import logger
 
