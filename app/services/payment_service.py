@@ -1,9 +1,29 @@
+import json
+import pika
 from sqlalchemy.orm import Session
 
+from app.logging_config import logger
 from app.metrics import successful_payment_counter
 from app.models.account import Account
 from app.models.payment import Payment
 from fastapi import HTTPException
+
+
+RABBITMQ_URL = "amqp://guest:guest@rabbitmq:5672/"
+
+
+def send_payment_receipt_to_queue(payment_id: int, email: str):
+    connection = pika.BlockingConnection(pika.URLParameters(RABBITMQ_URL))
+    channel = connection.channel()
+    channel.queue_declare(queue="payment_receipts", durable=True)
+
+    message = json.dumps({"payment_id": payment_id, "email": email})
+    channel.basic_publish(exchange='', routing_key="payment_receipts", body=message)
+
+    logger.info("Message sent to queue", payment_id=payment_id, email=email)
+
+    connection.close()
+
 
 def create_payment(db: Session, remitter_account_id: int, beneficiary_account_id: int, amount: float, user_id: int, email: str):
     if amount <= 0:
@@ -36,12 +56,7 @@ def create_payment(db: Session, remitter_account_id: int, beneficiary_account_id
 
     successful_payment_counter.inc()
 
-    # payment_data = {
-    #     'user_email': email,
-    #     'payment_id': payment.id,
-    #     'amount': amount
-    # }
-    # send_payment_event(payment_data)
+    send_payment_receipt_to_queue(payment.id, email)
 
     return payment
 

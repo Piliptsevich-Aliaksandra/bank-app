@@ -7,10 +7,10 @@ services:
       - "8000:8000"
     depends_on:
       - db
-      - kafka
+      - rabbitmq
     environment:
       - DATABASE_URL=postgresql://user:password@db:5432/mydatabase
-      - KAFKA_BROKER_URL=kafka:9093
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
     command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
   db:
@@ -26,19 +26,21 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
 
-  zookeeper:
-    image: confluentinc/cp-zookeeper:latest
+  rabbitmq:
+      image: rabbitmq:3-management
+      ports:
+        - "15672:15672"
+        - "5672:5672"
+
+  worker:
+    build: .
     environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-  kafka:
-    image: wurstmeister/kafka:latest
-    environment:
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9093
-      KAFKA_LISTENER_SECURITY_PROTOCOL: PLAINTEXT  # Указываем протокол безопасности
-      KAFKA_LISTENERS: PLAINTEXT://kafka:9093  # Этот слушатель будет использовать порт 9093
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-    ports:
-      - "9093:9093"
+      - DATABASE_URL=postgresql://user:password@db:5432/banking
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+      - PYTHONPATH=/app
+    depends_on:
+      - rabbitmq
+    command: [ "sh", "-c", "python app/consumers/payment_consumer.py" ]
 
   prometheus:
     image: prom/prometheus

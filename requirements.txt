@@ -19,3 +19,5 @@ prometheus_fastapi_instrumentator
 pytest-cov
 httpx
 bcrypt
+structlog
+pika
